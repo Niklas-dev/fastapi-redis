@@ -3,7 +3,9 @@ from fastapi import FastAPI, status, HTTPException
 from app.db.database import engine, db_dependency
 from app.routers.auth.services import user_dependency
 from app.routers.auth import models as auth_models
+from app.routers.data import models as data_models
 from app.routers.auth.auth import router as auth_router
+from app.routers.data.data import router as data_router
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import logging
@@ -30,8 +32,10 @@ app.add_middleware(
 app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
 
 app.include_router(auth_router)
+app.include_router(data_router)
 
 auth_models.Base.metadata.create_all(bind=engine)
+data_models.Base.metadata.create_all(bind=engine)
 
 
 
