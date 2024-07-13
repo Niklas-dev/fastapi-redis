@@ -11,12 +11,16 @@ router = APIRouter(
 )
 
 
-class DataRequest(BaseModel):
+class GetDataRequest(BaseModel):
     id: int
 
 
+class PostDataRequest(BaseModel):
+    value: string
+
+
 @router.get("/data")
-def get_data(data_request: DataRequest, db: db_dependency, cache: cache_dependency):
+def get_data(data_request: GetDataRequest, db: db_dependency, cache: cache_dependency):
     # Try to get data from the cache
     cached_data = cache.get(data_request.key)
     if cached_data:
@@ -31,3 +35,12 @@ def get_data(data_request: DataRequest, db: db_dependency, cache: cache_dependen
     cache.set(data_request.key, data.value)
 
     return {"data": data.value}
+
+
+@router.get("/post")
+def post_data(data_request: PostDataRequest, db: db_dependency):
+    data = Data(value=data_request.value)
+    db.add(data)
+    db.commit()
+    db.refresh(data)
+    return "Added data"
