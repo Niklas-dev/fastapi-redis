@@ -16,14 +16,15 @@ class GetDataRequest(BaseModel):
 
 
 class PostDataRequest(BaseModel):
-    value: string
+    value: str
 
 
-@router.get("/data")
+@router.get("/")
 def get_data(data_request: GetDataRequest, db: db_dependency, cache: cache_dependency):
     # Try to get data from the cache
     cached_data = cache.get(data_request.key)
     if cached_data:
+        print("returned from cache")
         return {"data": cached_data}
 
     # If not in cache, get data from the database
@@ -33,11 +34,11 @@ def get_data(data_request: GetDataRequest, db: db_dependency, cache: cache_depen
 
     # Store data in cache for future requests
     cache.set(data_request.key, data.value)
-
+    print("returned from db")
     return {"data": data.value}
 
 
-@router.get("/post")
+@router.post("/")
 def post_data(data_request: PostDataRequest, db: db_dependency):
     data = Data(value=data_request.value)
     db.add(data)
